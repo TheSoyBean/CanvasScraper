@@ -4,7 +4,8 @@ A CLI tool to download and parse Canvas course assignment data.
 
 ## Features
 - Parse assignments from Canvas modules/assignments/grades page
-- Export assignment list to CSV
+- **Support for Modules pages** - extracts module items (assignments, quizzes, pages)
+- Export assignment list to CSV with type metadata
 - Download assignment pages automatically (with authentication)
 - Parse assignment content into structured JSON
 
@@ -21,24 +22,48 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Step 1: Download the assignments page
-1. Go to your Canvas course
-2. Navigate to Assignments, Modules, or Grades page
-3. Right-click → "Save As" → Save as HTML (complete page)
-4. Save the file in the `courses/` directory
+### Quick Start
 
-### Step 2: Run the script
+1. **Download your Canvas page as HTML**:
+   - Go to Canvas → Your Course → Modules (or Assignments)
+   - Right-click → "Save As" → "Webpage, Complete"
+   - Save to `courses/` directory
+
+2. **Run the script**:
+   ```bash
+   python3 canvas_scraper.py
+   ```
+
+3. **Choose your workflow**:
+   - **Option 1**: Auto-download and parse (requires cookie)
+   - **Option 2**: Just create CSV (download manually later)
+
+### What the script does
+
+1. ✓ Parses HTML and extracts all module/assignment links
+2. ✓ Creates `assignments.csv` with URLs and metadata
+3. ✓ Downloads each URL as HTML (with authentication)
+4. ✓ Parses each HTML for detailed content:
+   - Title, Description, Due Date, Points
+   - Submission types, Availability dates
+   - Attached files, Rubric info
+   - Item type (assignment/quiz/page)
+5. ✓ Saves everything to `course_content.json`
+
+### Clear all courses
+
+To delete all course folders and start fresh:
 ```bash
-python3 canvas_scraper.py
+python3 canvas_scraper.py --clear
+# or
+python3 canvas_scraper.py -c
 ```
 
-### Step 3: Choose your workflow
-
-The script will:
-1. Parse the HTML file and extract all assignment links
-2. Create `assignments.csv` with assignment metadata
-3. Optionally download each assignment page
-4. Parse assignment content and save to `course_content_[course_name].json`
+This will:
+- Delete all course folders (e.g., `Chinese_1/`, `CE_Algor_Data_Struct/`)
+- Delete all loose HTML files in `courses/`
+- Delete all support folders (`*_files/`)
+- Prompt for confirmation before deletion
 
 ### Authentication (for downloads)
 
@@ -54,9 +79,11 @@ Canvas requires authentication to download assignment pages. You have two option
 1. Open Canvas in your browser while logged in
 2. Press F12 → Application/Storage → Cookies
 3. Find `_legacy_normandy_session` cookie
-4. Copy its value
+4. Copy its value (long string)
 5. Paste when the script prompts for cookie
 6. Script will attempt to download all assignments
+
+**📖 Detailed Cookie Instructions**: See [COOKIE_GUIDE.md](COOKIE_GUIDE.md) for step-by-step screenshots and troubleshooting.
 
 ## Output Files
 
