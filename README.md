@@ -1,29 +1,96 @@
 # CanvasScraper
 
-A simple CLI tool to help you collect assignment data from Canvas courses.
+A CLI tool to download and parse Canvas course assignment data.
 
-## Current Progress
-- CLI prompts for Canvas modules URL.
-- Prompts user to download and upload the modules HTML file.
-- Parses the modules HTML for assignment links.
-- Next steps: Prompt user to upload each assignment HTML file, parse them, and export all assignment data to a single JSON file.
-
-## Next Steps
-1. Run `python3 canvas_scraper.py`.
-2. Paste your Canvas modules URL when prompted.
-3. Download the modules page as HTML from your browser ("Save As"), then provide the file path when prompted.
-4. The script will parse the modules HTML and list all assignment links it finds.
-5. For each assignment link, download the assignment page as HTML and provide the file path when prompted.
-6. The script will parse each assignment HTML and collect the data.
-7. All assignment data will be exported to a single JSON file (e.g., `course-name.json`).
+## Features
+- Parse assignments from Canvas modules/assignments/grades page
+- Export assignment list to CSV
+- Download assignment pages automatically (with authentication)
+- Parse assignment content into structured JSON
 
 ## Requirements
 - Python 3
-- `beautifulsoup4` package (`pip install beautifulsoup4`)
+- Required packages: `beautifulsoup4`, `requests`
 
-## Planned Improvements
-- Automate assignment HTML file prompts and parsing.
-- Allow user to specify output directory and filename.
-- Improve assignment data extraction for more details.
-# CanvasScraper
-Scrapes courses on canvas if login granted
+Install dependencies:
+```bash
+pip install beautifulsoup4 requests
+# or
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Step 1: Download the assignments page
+1. Go to your Canvas course
+2. Navigate to Assignments, Modules, or Grades page
+3. Right-click → "Save As" → Save as HTML (complete page)
+4. Save the file in the `courses/` directory
+
+### Step 2: Run the script
+```bash
+python3 canvas_scraper.py
+```
+
+### Step 3: Choose your workflow
+
+The script will:
+1. Parse the HTML file and extract all assignment links
+2. Create `assignments.csv` with assignment metadata
+3. Optionally download each assignment page
+4. Parse assignment content and save to `course_content_[course_name].json`
+
+### Authentication (for downloads)
+
+Canvas requires authentication to download assignment pages. You have two options:
+
+**Option A: Manual download (recommended)**
+- Select "n" when asked to download
+- Manually download each assignment page from Canvas
+- Save files as `assignment_[ID].html` in `courses/[Course_Name]/` directory
+- Re-run the script and choose to parse existing files
+
+**Option B: Automatic download with cookie**
+1. Open Canvas in your browser while logged in
+2. Press F12 → Application/Storage → Cookies
+3. Find `_legacy_normandy_session` cookie
+4. Copy its value
+5. Paste when the script prompts for cookie
+6. Script will attempt to download all assignments
+
+## Output Files
+
+All files are organized in a course-specific folder:
+
+```
+courses/
+└── Course_Name/
+    ├── Assignments_ Course Name.html      # Original downloaded page
+    ├── assignments.csv                    # List of all assignments
+    ├── assignment_[ID].html               # Individual assignment pages
+    └── course_content.json                # Structured assignment data
+```
+
+### File descriptions:
+
+- `assignments.csv` - List of all assignments with metadata (ID, title, URL, due date, points)
+- `assignment_[ID].html` - Individual assignment HTML files
+- `course_content.json` - Structured assignment data in JSON format
+
+## Example JSON Output
+
+```json
+{
+  "course_name": "Chinese 1",
+  "assignments": [
+    {
+      "id": "22550830",
+      "title": "Week 8 Participation",
+      "url": "https://...",
+      "description": "...",
+      "due_date": "Oct 7 at 11:59pm",
+      "points_possible": "10"
+    }
+  ]
+}
+```
